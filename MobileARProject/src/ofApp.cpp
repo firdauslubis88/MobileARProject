@@ -2,9 +2,12 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	testImage.allocate(1281, 721, OF_IMAGE_COLOR);
-	cvImage.allocate(1281, 721);
-	thresImage.allocate(1281, 721);
+	ofDisableArbTex();
+
+	testImage.allocate(1280, 640, OF_IMAGE_COLOR);
+	cvImage.allocate(1280, 640);
+	thresImage.allocate(1280, 640);
+	pixels.allocate(1280, 640, OF_IMAGE_COLOR);
 	testImage.load("test-image.png");
 
 	gui.setup();
@@ -14,19 +17,56 @@ void ofApp::setup(){
 	gui.add(green_ut.setup("green_ut", 255, 0, 255));
 	gui.add(blue_lt.setup("blue_lt", 0, 0, 255));
 	gui.add(blue_ut.setup("blue_ut", 255, 0, 255));
+
+	sphereVboMesh = ofSpherePrimitive(2000, 24).getMesh();
+	for (int i = 0; i<sphereVboMesh.getNumTexCoords(); i++) {
+		sphereVboMesh.setTexCoord(i, ofVec2f(1.0) - sphereVboMesh.getTexCoord(i));
+	}
+	for (int i = 0; i<sphereVboMesh.getNumNormals(); i++) {
+		sphereVboMesh.setNormal(i, sphereVboMesh.getNormal(i) * ofVec3f(-1));
+	}
+
+	ldFbo.allocate(1280, 640);
+
+	videoPlayer.load("001_er.mp4");
+	videoPlayer.setLoopState(OF_LOOP_NORMAL);
+	videoPlayer.play();
+
+	cam.setAutoDistance(false);
+	cam.setDistance(0);
+
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
+	videoPlayer.update();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-//	testImage.draw(0, 0, 1281, 721);
+//	videoPlayer.draw(0, 0);
+	ldFbo.begin();
+	cam.begin();
+	//		ofClear(0);
+	//		_shader.begin();
+	//		_shader.setUniformTexture("mainTex", ldVideoGrabber.getTexture(), 0);
+	//		_shader.setUniforms(ldParameterGroup);
+	//		myImage.rotate90(3);
+	//		ldVideoGrabber.getTexture().
+	videoPlayer.getTextureReference().bind();
+	sphereVboMesh.draw();
+	videoPlayer.getTextureReference().unbind();
+	//		_shader.end();
+	cam.end();
+	ldFbo.end();
+//	ldFbo.draw(0, 0, 1280, 640);
+	ldFbo.readToPixels(pixels);
+	testImage.setFromPixels(pixels);
+	testImage.setImageType(OF_IMAGE_COLOR);
 	cvImage.setFromPixels(testImage.getPixels());
+
+	//	cvImage.setFromPixels(testImage.getPixels());
 	cv::Mat matInputImage, matOutputImage[5], matOutputImage_ut[3], matOutputImage_lt[3], tempPlanes[3], tempAdd[3];
-//	cv::Mat* planes;
 	matInputImage = cv::cvarrToMat(cvImage.getCvImage());
 	cv::cvtColor(matInputImage, matInputImage, CV_BGR2HSV);
 	cv::split(matInputImage, tempPlanes);
@@ -47,7 +87,7 @@ void ofApp::draw(){
 	IplImage* pTemp = &temp;
 	thresImage = pTemp;
 	
-	thresImage.draw(0, 0, 1281, 721);
+	thresImage.draw(0, 0, 1280, 640);
 
 	gui.draw();
 }

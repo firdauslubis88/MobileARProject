@@ -35,7 +35,14 @@ class ofApp : public ofBaseApp{
 		ofImage testImage;
 		ofxCvColorImage cvImage;
 		ofxCvGrayscaleImage thresImage;
+		ofPixels pixels;
 
 		ofxIntSlider red_lt, red_ut, green_lt,green_ut, blue_lt, blue_ut;
 		ofxPanel gui;
+
+		ofVideoPlayer videoPlayer;
+		ofEasyCam cam;
+		ofVboMesh sphereVboMesh;
+		ofFbo ldFbo;
+
 };
