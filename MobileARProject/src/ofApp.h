@@ -32,17 +32,17 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		
-		ofImage testImage;
-		ofxCvColorImage cvImage;
+		ofImage testImage, bgImage, checkImage;
+		ofxCvColorImage cvImage, cvBgImage, combinedImage;
 		ofxCvGrayscaleImage thresImage;
-		ofPixels pixels;
+		ofPixels pixels, bgPixels;
 
 		ofxIntSlider red_lt, red_ut, green_lt,green_ut, blue_lt, blue_ut;
 		ofxPanel gui;
 
 		ofVideoPlayer videoPlayer;
 		ofEasyCam cam;
-		ofVboMesh sphereVboMesh;
-		ofFbo ldFbo;
+		ofVboMesh sphereVboMesh, bgSphereVboMesh;
+		ofFbo ldFbo, ldBgFbo;
 
 };
