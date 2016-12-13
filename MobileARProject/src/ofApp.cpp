@@ -4,16 +4,20 @@
 void ofApp::setup() {
 	ofDisableArbTex();
 
-	testImage.allocate(1280, 640, OF_IMAGE_COLOR);
-	bgImage.allocate(1280, 640, OF_IMAGE_COLOR);
-	cvImage.allocate(1280, 640);
-	cvBgImage.allocate(1280, 640);
-	combinedImage.allocate(1280, 640);
-	thresImage.allocate(1280, 640);
-	pixels.allocate(1280, 640, OF_IMAGE_COLOR);
-	bgPixels.allocate(1280, 640, OF_IMAGE_COLOR);
+	testImage.allocate(1920, 960, OF_IMAGE_COLOR);
+	bgImage.allocate(1920, 960, OF_IMAGE_COLOR);
+	finalOfImage.allocate(1920, 960, OF_IMAGE_COLOR);
+	cvImage.allocate(1920, 960);
+	cvImage2.allocate(1920, 960);
+	cvBgImage.allocate(1920, 960);
+	combinedImage.allocate(1920, 960);
+	thresImage.allocate(1920, 960);
+	pixels.allocate(1920, 960, OF_IMAGE_COLOR);
+	bgPixels.allocate(1920, 960, OF_IMAGE_COLOR);
+	tempPixels.allocate(1920, 960, OF_IMAGE_COLOR);
+	tempBgPixels.allocate(1920, 960, OF_IMAGE_COLOR);
 	bgImage.load("background.jpg");
-//	testImage.load("green1.jpg");
+//	testImage.load("background.jpg");
 
 	gui.setup();
 	gui.add(red_lt.setup("h_lt", 65, 0, 255));
@@ -39,16 +43,15 @@ void ofApp::setup() {
 		bgSphereVboMesh.setNormal(i, bgSphereVboMesh.getNormal(i) * ofVec3f(-1));
 	}
 
-	ldFbo.allocate(1280, 640);
-	ldBgFbo.allocate(1280, 640);
+	ldFbo.allocate(1920, 960);
+	ldBgFbo.allocate(1920, 960);
 
-	videoPlayer.load("video.mp4");
+	videoPlayer.load("video_er.mp4");
 	videoPlayer.setLoopState(OF_LOOP_NORMAL);
 	videoPlayer.play();
 
 	cam.setAutoDistance(false);
 	cam.setDistance(0);
-
 }
 
 //--------------------------------------------------------------
@@ -59,53 +62,26 @@ void ofApp::update() {
 //--------------------------------------------------------------
 void ofApp::draw() {
 	//	videoPlayer.draw(0, 0);
-	ldFbo.begin();
-	cam.begin();
-	//		ofClear(0);
-	//		_shader.begin();
-	//		_shader.setUniformTexture("mainTex", ldVideoGrabber.getTexture(), 0);
-	//		_shader.setUniforms(ldParameterGroup);
-	//		myImage.rotate90(3);
-	//		ldVideoGrabber.getTexture().
-	videoPlayer.getTextureReference().bind();
-	sphereVboMesh.draw();
-	videoPlayer.getTextureReference().unbind();
-	//		_shader.end();
-	cam.end();
-	ldFbo.end();
-	//	ldFbo.draw(0, 0, 1280, 640);
 
-
-	ldBgFbo.begin();
-	/*
-	cam.begin();
-	//		ofClear(0);
-	//		_shader.begin();
-	//		_shader.setUniformTexture("mainTex", ldVideoGrabber.getTexture(), 0);
-	//		_shader.setUniforms(ldParameterGroup);
-	//		myImage.rotate90(3);
-	//		ldVideoGrabber.getTexture().
-	bgImage.getTextureReference().bind();
-	bgSphereVboMesh.draw();
-	bgImage.getTextureReference().unbind();
-	//		_shader.end();
-	cam.end();
-	*/
-	bgImage.draw(0, 0);
-	ldBgFbo.end();
-
-	ldFbo.readToPixels(pixels);
-	ldBgFbo.readToPixels(bgPixels);
-	testImage.setFromPixels(pixels);
+//	ldFbo.readToPixels(pixels);
+//	ldBgFbo.readToPixels(bgPixels);
+//	testImage.setFromPixels(pixels);
+//	testImage.setImageType(OF_IMAGE_COLOR);
+//	bgImage.setFromPixels(bgPixels);
+//	bgImage.setImageType(OF_IMAGE_COLOR);
+	tempPixels = videoPlayer.getPixels();
+	tempBgPixels = bgImage.getPixels();
+	testImage.setFromPixels(tempPixels);
 	testImage.setImageType(OF_IMAGE_COLOR);
-	bgImage.setFromPixels(bgPixels);
+	bgImage.setFromPixels(tempBgPixels);
 	bgImage.setImageType(OF_IMAGE_COLOR);
-	cvImage.setFromPixels(testImage.getPixels());
+//	cvImage.setFromPixels(bgImage.getPixels());
 	cvBgImage.setFromPixels(bgImage.getPixels());
+	cvImage2.setFromPixels(testImage.getPixels());
 
 	//	cvImage.setFromPixels(testImage.getPixels());
 	cv::Mat matInputImage, matOutputImage[5], matOutputImage_ut[3], matOutputImage_lt[3], tempPlanes[3], tempAdd[3], matBgImage;
-	matInputImage = cv::cvarrToMat(cvImage.getCvImage());
+	matInputImage = cv::cvarrToMat(cvImage2.getCvImage());
 	cv::Mat tempMatInputImage;
 	matInputImage.copyTo(tempMatInputImage);
 	matBgImage = cv::cvarrToMat(cvBgImage.getCvImage());
@@ -128,6 +104,10 @@ void ofApp::draw() {
 	cv::Mat mask, inverseMask;
 	cv::Mat input[] = { matOutputImage[4],matOutputImage[4],matOutputImage[4] };
 	cv::merge(input, 3, mask);
+//	cout << "bg size:\t" << matBgImage.size() << endl;
+//	cout << "mask size:\t" << mask.size() << endl;
+//	cout << "content size:\t" << tempMatInputImage.size() << endl;
+//	cout << "mask size:\t" << mask.size() << endl;
 	cv::bitwise_and(matBgImage, mask, tempBg);
 	cv::Mat inverseRes = 255 - matOutputImage[4];
 	cv::Mat input2[] = { inverseRes,inverseRes,inverseRes };
@@ -139,7 +119,25 @@ void ofApp::draw() {
 	IplImage temp = finalImage;
 	IplImage* pTemp = &temp;
 	combinedImage = pTemp;
-	combinedImage.draw(0, 0, 1280, 640);
+	finalOfImage.setFromPixels(combinedImage.getPixels());
+//	combinedImage.draw(0, 0, 1280, 640);
+
+	ldFbo.begin();
+	cam.begin();
+	//		ofClear(0);
+	//		_shader.begin();
+	//		_shader.setUniformTexture("mainTex", ldVideoGrabber.getTexture(), 0);
+	//		_shader.setUniforms(ldParameterGroup);
+	//		myImage.rotate90(3);
+	//		ldVideoGrabber.getTexture().
+	finalOfImage.getTextureReference().bind();
+	sphereVboMesh.draw();
+	finalOfImage.getTextureReference().unbind();
+	//		_shader.end();
+	cam.end();
+	ldFbo.end();
+	ldFbo.draw(0, 0, 1920, 960);
+//	combinedImage.draw(0, 0);
 
 	gui.draw();
 }
