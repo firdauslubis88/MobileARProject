@@ -303,7 +303,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <AdditionalDependencies>..\..\of_v0.9.8_vs_release\addons\ofxOpenCv\libs\opencv\lib\vs\x64\Release\opencv_core310.lib;..\..\of_v0.9.8_vs_release\addons\ofxOpenCv\libs\opencv\lib\vs\x64\Release\opencv_imgproc310.lib;..\..\of_v0.9.8_vs_release\addons\ofxOpenCv\libs\opencv\lib\vs\x64\Release\opencv_objdetect310.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\of_v0.9.8_vs_release\addons\ofxOpenCv\libs\opencv\lib\vs\x64\Release\opencv_core320.lib;..\..\of_v0.9.8_vs_release\addons\ofxOpenCv\libs\opencv\lib\vs\x64\Release\opencv_imgproc320.lib;..\..\of_v0.9.8_vs_release\addons\ofxOpenCv\libs\opencv\lib\vs\x64\Release\opencv_objdetect320.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
